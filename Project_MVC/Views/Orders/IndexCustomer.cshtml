@@ -1,0 +1,277 @@
+﻿@model IEnumerable<Project_MVC.Models.Order>
+@using Project_MVC.Models
+@using Project_MVC.Utils
+
+@{
+    ViewBag.Title = "Invoices";
+    Layout = "~/Views/Shared/_LayoutCustomerPage.cshtml";
+
+    var thisPage = ViewBag.Page as ThisPage;
+    var compareDate = ViewBag.CompareDate as DateTimeModel;
+    var startDate = "";
+    var endDate = "";
+    if (compareDate.startDate != null)
+    {
+        startDate = Utility.GetDateString(compareDate.startDate.Value, "dd/MM/yyyy");
+    }
+    if (compareDate.endDate != null)
+    {
+        endDate = Utility.GetDateString(compareDate.endDate.Value, "dd/MM/yyyy");
+    }
+}
+<section>
+    <div class="container">
+        <div class="col-md-12 text-center">
+            <div class="create_account">
+                <h2>@ViewBag.Title</h2>
+            </div>
+        </div>
+    </div>
+</section>
+@using (Html.BeginForm("IndexCustomer", "Orders", FormMethod.Get))
+{
+    <div class="col-sm-push-1 col-md-11">
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="col-md-5 ">
+                    <p>Enter Ship Name - Order Id:</p>
+                </div>
+                <div class="col-md-6">
+                    @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="clearfix"></div><br />
+            <div class="form-group">
+                <div class="col-md-5">
+                    <p>Choose Status:</p>
+                </div>
+                <div class="col-md-6">
+                    @Html.DropDownList("Status", ViewBag.DDLStatus as SelectList, "Select Status", new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="col-md-4 ">
+                    <p>Choose Payment Type:</p>
+                </div>
+                <div class="col-md-6">
+                    @Html.DropDownList("PaymentType", ViewBag.DDLPaymentType as SelectList, "Select Payment Type", new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="clearfix"></div><br />
+
+            <div class="form-group">
+                <div class="col-md-4 ">
+                    <p>Choose Date Range:</p>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" name="dateRange" value="@startDate - @endDate " style="background: #fff; cursor: pointer; padding: 7px 10px; border: 1px solid #ccc; width: 180px" />
+                    @Html.Hidden("start", startDate)
+                    @Html.Hidden("end", endDate)
+                    <input class="btn btn-success" type="submit" value="Search" style="margin-left:1px;" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+
+}
+
+<div class="clearfix"></div>
+<br />
+
+<div class="row">
+    <div class="col-sm-push-1 col-md-10">
+        @using (Html.BeginForm("IndexCustomer", "Orders", FormMethod.Get))
+        {
+            <table class="table table-bordered table-hover" style="text-align:center;">
+                <thead>
+                    <tr>
+                        <th class="text-center">
+                            @Html.DisplayNameFor(model => model.Id)
+                        </th>
+                        <th class="text-center">
+                            @Html.DisplayNameFor(model => model.PaymentTypeId)
+                        </th>
+                        <th class="text-left">
+                            @Html.DisplayNameFor(model => model.ShipName)
+                        </th>
+                        <th class="text-left">
+                            @Html.DisplayNameFor(model => model.ShipAddress)
+                        </th>
+                        <th class="text-left">
+                            @Html.DisplayNameFor(model => model.ShipPhone)
+                        </th>
+                        <th class="text-right">
+                            @Html.DisplayNameFor(model => model.TotalPrice)
+                        </th>
+                        <th class="text-center">
+                            @Html.DisplayNameFor(model => model.CreatedAt)
+                        </th>
+                        <th class="text-center">
+                            @Html.DisplayNameFor(model => model.UpdatedAt)
+                        </th>
+                        <th class="text-center">
+                            @Html.DisplayNameFor(model => model.Status)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.PaymentTypeId)
+                        </td>
+                        <td class="text-left">
+                            @Html.DisplayFor(modelItem => item.ShipName)
+                        </td>
+                        <td class="text-left">
+                            @Html.DisplayFor(modelItem => item.ShipAddress)
+                        </td>
+                        <td class="text-left">
+                            @Html.DisplayFor(modelItem => item.ShipPhone)
+                        </td>
+                        <td class="text-right">
+                            @item.TotalPrice.ToString("C", FlowerUtility.UnitedStates)
+                            @*@Html.DisplayFor(modelItem => item.Price)*@
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.CreatedAt)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.UpdatedAt)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            <a href="@Url.Action( "DisplayCartAfterCreateOrder", "ShoppingCart", new { orderId = item.Id }, null)">
+                                <span class="glyphicon glyphicon-th-list"></span>
+                            </a>
+                            @*@Html.ActionLink("Details", "DisplayCartAfterCreateOrder", "ShoppingCart", new { orderId = item.Id }, null)*@
+                        </td>
+                    </tr>
+                }
+            </table>
+            @Html.Partial("_Paginate", thisPage)
+        }
+    </div>
+</div>
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+
+@Html.AntiForgeryToken()
+
+@section scripts{
+    @Scripts.Render("~/bundles/custom");
+    <script>
+        var start = moment().subtract(29, 'days');
+        var end = moment();
+        var newStart = $("#start").val();
+        var newEnd = $("#end").val();
+        if (newStart != null && newStart != "") {
+            newStart = newStart.split("/");
+            start = new Date(newStart[2], newStart[1] - 1, newStart[0]);
+        }
+
+        if (newEnd != null && newEnd != "") {
+            newEnd = newEnd.split("/");
+            end = new Date(newEnd[2], newEnd[1] - 1, newEnd[0]);
+        }
+
+        //function cb(newStartDate, newEndDate) {
+        //    $('input[name="dateRange"]').html(newStartDate.format('MMMM D, YYYY') + ' - ' + newEndDate.format('MMMM D, YYYY'));
+        //    //console.log(newStartDate.format('MMMM D, YYYY') + ' - ' + newEndDate.format('MMMM D, YYYY'));
+        //}
+
+        $('input[name="dateRange"]').daterangepicker({
+            startDate: start,
+            endDate: end,
+            ranges:
+            {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 10 Months': [moment().subtract(10, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 10 Years': [moment().subtract(10, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            }
+        });
+
+        $('input[name="dateRange"]').on('apply.daterangepicker', function (ev, picker) {
+            $("#start").val(picker.startDate.format("DD/MM/YYYY"));
+            $("#end").val(picker.endDate.format("DD/MM/YYYY"));
+            //window.location.href = `/Orders/Index?start=${picker.startDate.format("D/MM/YYYY")}&end=${picker.endDate.format("D/MM/YYYY")}`;
+            //console.log(newStartDate.format('MMMM D, YYYY') + ' - ' + newEndDate.format('MMMM D, YYYY'));
+            //console.log("123");
+            //this.outerHTML = newStartDate.format("D/MM/YYYY") + ' - ' + newEndDate.format("D/MM/YYYY");
+        });
+    </script>
+}
+
+
+@*<div class="row">
+        <div class="col-md-12">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>Enter Ship Name - OrderId:</p>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>
+                            Choose Status:
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownList("Status", EnumHelper.GetSelectList(typeof(Order.OrderStatus)), "Select Status", new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>Choose Payment Type:</p>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownList("PaymentType", EnumHelper.GetSelectList(typeof(Order.PaymentType)), "Select Payment Type", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>Choose Date Range:</p>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="dateRange" value="@startDate - @endDate" />
+                        @Html.Hidden("start", startDate)
+                        @Html.Hidden("end", endDate)
+                        <input type="submit" value="Search" class="btn btn-default" style="margin-left:15px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />*@

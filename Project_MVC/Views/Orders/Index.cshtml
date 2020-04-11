@@ -1,0 +1,403 @@
+﻿@model IEnumerable<Project_MVC.Models.Order>
+@using Project_MVC.Models
+@using Project_MVC.Utils
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var thisPage = ViewBag.Page as ThisPage;
+    var url = "/Orders/Delete/";
+    var compareDate = ViewBag.CompareDate as DateTimeModel;
+    var startDate = "";
+    var endDate = "";
+    if (compareDate.startDate != null)
+    {
+        startDate = Utility.GetDateString(compareDate.startDate.Value, "dd/MM/yyyy");
+    }
+    if (compareDate.endDate != null)
+    {
+        endDate = Utility.GetDateString(compareDate.endDate.Value, "dd/MM/yyyy");
+    }
+    var lstCurrentOrders = ViewBag.ListCurrentOrders as List<Order>;
+    if (lstCurrentOrders == null || lstCurrentOrders.Count == 0)
+    {
+        lstCurrentOrders = new List<Order>();
+    }
+}
+
+<h1>Index</h1>
+@*<p>
+        @Html.ActionLink("Create New", "Create")
+    </p>*@
+<div class="form-horizontal">
+    @using (Html.BeginForm("Index", "Orders", FormMethod.Get))
+    {
+        <div class="col-md-12 tablebox ">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-md-5 ">
+                        <p>Enter Ship Name - User Name - OrderId:</p>
+                    </div>
+                    <div class="col-md-5">
+                        @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-5 control-label">
+                        <p>Choose Status:</p>
+                    </div>
+                    <div class="col-md-5">
+                        @Html.DropDownList("Status", ViewBag.DDLStatus as SelectList, "Select Status", new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-md-5 control-label">
+                        <p>Choose Payment Type:</p>
+                    </div>
+                    <div class="col-md-5">
+                        @Html.DropDownList("PaymentType", ViewBag.DDLPaymentType as SelectList, "Select Payment Type", new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="clearfix"></div><br />
+
+                <div class="form-group">
+                    <div class="col-md-5 control-label">
+                        <p>Choose Date Range:</p>
+                    </div>
+                    <div class="col-md-">
+                        <input type="text" name="dateRange" value="@startDate - @endDate " style="background: #fff; cursor: pointer; padding: 7px 10px; border: 1px solid #ccc; width: 194px" />
+                        @Html.Hidden("start", startDate.ToString())
+                        @Html.Hidden("end", endDate.ToString())
+                        <input class="btn btn-success" type="submit" value="Search" style="margin-left:15px;" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <br />
+    }
+</div>
+<div class="clearfix"></div>
+<br />
+<h2>Chart</h2>
+<div class="tablebox">
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <div id="chartPie" style="height: 300px; width: 100%;"></div>
+</div>
+<br />
+<H1>List Orders</H1>
+<div class="clearfix"></div>
+<br />
+<div class="col-md-11 tablebox">
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <table class="table table-bordered" style="text-align:center">
+            <thead>
+                <tr>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.Id)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.AppUser.UserName)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.PaymentTypeId)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.ShipName)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.ShipAddress)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.ShipPhone)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.TotalPrice)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.CreatedAt)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.UpdatedAt)
+                    </th>
+                    <th class="text-center">
+                        @Html.ActionLink("CreatedBy", "Index", new { sortOrder = ViewBag.NameSortParm })
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.UpdatedBy)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AppUser.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentTypeId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShipName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShipAddress)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShipPhone)
+                    </td>
+                    <td style="text-align:right;">
+                        @item.TotalPrice.ToString("C", FlowerUtility.UnitedStates)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedAt)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UpdatedAt)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedBy)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UpdatedBy)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @if (item.Status != Order.OrderStatus.Done)
+                        {
+                            <a href="@Url.Action("Edit", new { id = item.Id })">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                        }
+                        <a href="@Url.Action("Details", new { id = item.Id })">
+                            <span class="glyphicon glyphicon-th-list"></span>
+                        </a>
+                        @if (item.Status == Order.OrderStatus.Cancel)
+                        {
+                            @*@Html.ActionLink(" ", "Delete", new { id = item.Id },
+                                new { @class = "glyphicon glyphicon-remove btn-delete-notify", @id = "delete-" + item.Id, data_request_url = @url })*@
+                            <a href="javascript:void(0)" class="glyphicon glyphicon-remove btn-delete-notify" id="@item.Id" data-request-url="@url"></a>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+        @Html.Partial("_Paginate", thisPage)
+    }
+    @*@using (Html.BeginForm("ExportToExcel", "Orders", FormMethod.Post))
+        {
+            <input type="submit" value="Export to Excel" class="btn btn-primary" />
+        }*@
+    @Html.ActionLink("Export To Excel", "ExportToExcel", "Orders",
+        new { filter = Json.Encode(@thisPage), startDate = startDate, endDate = endDate }, new { @class = "btn btn-primary" })
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/custom");
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script>
+        debugger;
+        var arrRevenuesPieChart = @Html.Raw(ViewBag.DataPointsPieChart);
+         var arrRevenues = @Html.Raw(ViewBag.DataPoints);
+        var newArrRev = [];
+        arrRevenues.forEach(convert2DateTime);
+
+        function convert2DateTime(item) {
+            if (item.label == null) {
+                var a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(?:([\+-])(\d{2})\:(\d{2}))?Z?$/.exec(item.x);
+                if (a) {
+                    item.x = new Date(+a[1], +a[2] - 1, +a[3], +a[4], +a[5], +a[6]);
+                    var sendData = {x : item.x, y : item.y};
+                    newArrRev.push(sendData);
+                }
+            } else {
+                    var sendData = {y : item.y, label : item.label};
+                newArrRev.push(sendData);
+            }
+      }
+
+        window.onload = function () {
+            var chart = new CanvasJS.Chart("chartContainer",
+                {
+                    title: {
+                        text: "Revenue Chart"
+                    },
+                    axisX: {
+                        title: "DateTime",
+                        gridThickness: 2
+                    },
+                    axisY: {
+                        title: "Revenue ($)",
+                        valueFormatter: function (e) {
+                            if (e.value < 1000) {
+                                return "$" + e.value;
+                            }
+                            else {
+                                return "$#,###,#0";
+                            }
+                        }
+                    },
+                    data: [{
+                        type: "area", //change type to bar, line, area, pie, etc
+                        dataPoints: newArrRev,
+                }]
+                });
+            chart.render();
+
+            var chartPie = new CanvasJS.Chart("chartPie",
+                {
+        theme: "light2",
+	animationEnabled: true,
+		title:{
+			text: "Flowers Revenues Rate"
+		},
+		//legend: {
+		//	maxWidth: 350,
+		//	itemWidth: 120
+		//},
+		data: [
+		{
+			type: "pie",
+			startAngle: 240,
+		yValueFormatString: "##0.00\"%\"",
+		indexLabel: "{label} - {y}",
+			dataPoints: arrRevenuesPieChart
+		}
+		]
+	});
+	chartPie.render();
+        }
+  //       window.onload = function () {
+  //  var chart = new CanvasJS.Chart("chartContainer",
+  //  {
+  //    zoomEnabled: true,
+
+  //    title:{
+  //     text: "Chart With Date-Time Stamps Inputs"
+  //   },
+
+  //   data: [
+  //   {
+  //    type: "area",
+  //           xValueType: "dateTime",
+  //           dataPoints: arrRevenues
+  //  }
+  //  ]
+  //});
+
+  //  chart.render();
+  //}
+    </script>
+    <script>
+        debugger;
+        var start = moment().subtract(29, 'days');
+        var end = moment();
+        var newStart = $("#start").val();
+        var newEnd = $("#end").val();
+        if (newStart != null && newStart != "") {
+            newStart = newStart.split("/");
+            start = new Date(newStart[2], newStart[1] - 1, newStart[0]);
+        }
+
+        if (newEnd != null && newEnd != "") {
+            newEnd = newEnd.split("/");
+            end = new Date(newEnd[2], newEnd[1] - 1, newEnd[0]);
+        }
+
+        //function cb(newStartDate, newEndDate) {
+        //    $('input[name="dateRange"]').html(newStartDate.format('MMMM D, YYYY') + ' - ' + newEndDate.format('MMMM D, YYYY'));
+        //    //console.log(newStartDate.format('MMMM D, YYYY') + ' - ' + newEndDate.format('MMMM D, YYYY'));
+        //}
+
+        $('input[name="dateRange"]').daterangepicker({
+            startDate: start,
+            endDate: end,
+            ranges:
+            {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 10 Months': [moment().subtract(10, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 10 Years': [moment().subtract(10, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            }
+        });
+
+        $('input[name="dateRange"]').on('apply.daterangepicker', function (ev, picker) {
+            $("#start").val(picker.startDate.format("DD/MM/YYYY"));
+            $("#end").val(picker.endDate.format("DD/MM/YYYY"));
+            //window.location.href = `/Orders/Index?start=${picker.startDate.format("D/MM/YYYY")}&end=${picker.endDate.format("D/MM/YYYY")}`;
+            //console.log(newStartDate.format('MMMM D, YYYY') + ' - ' + newEndDate.format('MMMM D, YYYY'));
+            //console.log("123");
+            //this.outerHTML = newStartDate.format("D/MM/YYYY") + ' - ' + newEndDate.format("D/MM/YYYY");
+        });
+    </script>
+}
+
+@*<div class="row">
+        <div class="col-md-12">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>Enter Ship Name - User Name - OrderId:</p>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>
+                            Choose Status:
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownList("Status", EnumHelper.GetSelectList(typeof(Order.OrderStatus)), "Select Status", new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>Choose Payment Type:</p>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownList("PaymentType", EnumHelper.GetSelectList(typeof(Order.PaymentType)), "Select Payment Type", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <p>Choose Date Range:</p>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="dateRange" value="@startDate - @endDate" />
+                        @Html.Hidden("start", startDate)
+                        @Html.Hidden("end", endDate)
+                        <input class="btn btn-success" type="submit" value="Search" style="margin-left:15px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@

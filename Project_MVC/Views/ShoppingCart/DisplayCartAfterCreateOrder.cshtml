@@ -1,0 +1,331 @@
+﻿@model  Project_MVC.Models.Order
+@using Project_MVC.Utils
+@using Project_MVC.Models
+@using Project_MVC.Services
+@{
+    ViewBag.Title = "DisplayCartAfterCreateOrder";
+    Layout = "~/Views/Shared/_LayoutCustomerPage.cshtml";
+    var order = ViewBag.ListFlowers as ShoppingCart;
+    var ListFlowers = new MySQLFlowerService();
+    var CategoryCode = ViewBag.CategoryCode;
+    var lstFlowersInOrder = ViewBag.ListFlowersInOrder as List<FlowersInOrderModel>;
+
+    //var paypal = ViewBag.Paypal as PayPalModel;
+}
+
+@*Paypal*@
+@*@Html.Hidden("cmd", paypal.cmd)
+@Html.Hidden("business", paypal.business)
+@Html.Hidden("noShipping", paypal.no_shipping)
+@Html.Hidden("returnUrl", paypal.@return)
+@Html.Hidden("cancelReturn", paypal.cancel_return)
+@Html.Hidden("notifyUrl", paypal.notify_url)
+@Html.Hidden("currencyCode", paypal.currency_code)
+@Html.Hidden("itemName", paypal.item_name)
+@Html.Hidden("amount", paypal.amount)*@
+
+<div class="container">
+    <div class="row">
+        <div class="title1" style="text-align:center; margin-left: 40px;">
+            <h2><b>Order Information</b></h2>
+        </div><br />
+        <div class="col-md-12" style="margin-left:160px">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => @HttpContext.Current.User.Identity.Name, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => @HttpContext.Current.User.Identity.Name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => @HttpContext.Current.User.Identity.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.TotalPrice, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Model.TotalPrice.ToString("C", FlowerUtility.UnitedStates)
+                        @Html.ValidationMessageFor(model => model.TotalPrice, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PaymentTypeId, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.PaymentTypeId, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PaymentTypeId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CreatedAt, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.CreatedAt, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.Status, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ShipName, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.ShipName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ShipName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ShipPhone, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.ShipPhone, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ShipPhone, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ShipAddress, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.ShipAddress, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ShipAddress, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clearfix"></div><br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.UpdatedAt, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.UpdatedAt, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.UpdatedAt, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-10" style="margin-left:10px;">
+                <div class="clearfix"></div><br />
+                <div class="title2" style="text-align:center;margin-right:50px;">
+                    <h2><b>List of ordered products</b></h2><br />
+                </div>
+                <div class="shopping-cart-table">
+                    <table class="cart_items">
+                        @Html.Partial("~/Views/Orders/_FlowersInOrder.cshtml", lstFlowersInOrder)
+                    </table>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            @switch (Model.PaymentTypeId)
+            {
+                case Order.PaymentType.Cod:
+                    <div class="pleasecod" style="text-align:center;margin-right: 200px;color:red;">
+                        <h3><b>Please wait for our contact !!!</b></h3>
+                    </div>
+                    <button style="margin-left:390px;" class="btn btn-success" onclick="location.href='@Url.Action("Index","Home")'">Back to Home</button>
+                    break;
+                case Order.PaymentType.InternetBanking:
+                    if (Model.Status != Order.OrderStatus.Paid && Model.Status != Order.OrderStatus.Done)
+                    {
+                        <div class="form-group  btn btn-success" style="margin-left:380px">
+                            @*<input type="submit" name="btnConfirm" value="Check Out with Paypal" />*@
+                            @Html.ActionLink("Payment", "ValidateCommand", new { orderId = Model.Id, id = "paypal-button-container" })
+                            @*<div id="paypal-button-container"></div>*@
+                        </div>
+                    }
+                    break;
+                case Order.PaymentType.DirectTransfer:
+                    // information that contains Bank Account,... (this is needed to transfer money from Customer to Seller)
+                    <div class="col-md-10">
+                        <div class="informationbank" style="text-align:center;margin-left:80px">
+                            <h3><b>Thông tin tài khoản ngân hàng của chúng tôi</b></h3>
+                        </div><br />
+                        <table class="table table-bordered table-hover" style="margin-left:5px">
+                            <thead>
+                                <tr style="background:green;color:white">
+                                    <th scope="col">#</th>
+                                    <th scope="col">Tên Chủ tài khoản</th>
+                                    <th scope="col">Số Điện thoại</th>
+                                    <th scope="col">Số tài khoản</th>
+                                    <th scope="col">Tên ngân hàng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <th>Trần Khắc Tiệp</th>
+                                    <td>0386778908</td>
+                                    <td>0021000459733</td>
+                                    <td>Ngân hàng công thương Vietcombank</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <th>Đỗ Hoàng Tuấn</th>
+                                    <td>0386776554</td>
+                                    <td>19038434848099</td>
+                                    <td>Techcombank Ngân hàng TMCP kỹ thương việt nam</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <th>Nguyễn Thị Thu thảo</th>
+                                    <td>0386374903</td>
+                                    <td>0457988939839</td>
+                                    <td>Ngân hàng thương mại cổ phần Sài Gòn thường tín Saconbank</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">4</th>
+                                    <th>Định Vạn Hoàng An</th>
+                                    <td>0386228908</td>
+                                    <td>02067800993733</td>
+                                    <td>Ngân hàng Thương mại Cổ phần Tiên Phong TPBank</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button style="margin-left:390px;" class="btn btn-success" onclick="location.href='@Url.Action("Index","Home")'">Back to Home</button>
+                    </div>
+
+                    break;
+                default:
+                    break;
+            }
+
+        </div>
+    </div>
+</div>
+<br />
+
+@section scripts{
+    @*<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>*@
+    @*<script>
+            // Render the PayPal button into #paypal-button-container
+            paypal.Buttons({
+                style: {
+                    size: 'small',
+                    color: 'gold',
+                    shape: 'pill',
+                    label: 'checkout',
+                    tagline: 'true'
+                },
+
+                // Set up the transaction
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '0.01'
+                            }
+                        }]
+                    });
+                },
+
+                // Finalize the transaction
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (details) {
+                        // Show a success message to the buyer
+                        alert('Transaction completed by ' + details.payer.name.given_name + '!');
+                    });
+                }
+
+
+            }).render('#paypal-button-container');
+        </script>*@
+    @*<script>
+            //paypal.Buttons({
+
+            //    // Set up the transaction
+            //    createOrder: function (data, actions) {
+            //        return actions.order.create({
+            //            purchase_units: [{
+            //                amount: {
+            //                    value: '0.01'
+            //                }
+            //            }]
+            //        });
+            //    },
+
+            //    // Finalize the transaction
+            //    onApprove: function (data, actions) {
+            //        return actions.order.capture().then(function (details) {
+            //            // Show a success message to the buyer
+            //            $.alert('Transaction completed by ' + details.payer.name.given_name + '!');
+            //        });
+            //    }
+
+            //    onerror: function (err) {
+            //        return
+            //    }
+
+
+            //}).render('#paypal-button-container');
+            var cmdPaypal = $("#cmd").val;
+            var businessPaypal = $("#business").val;
+            var noShippingPaypal = $("#noShipping").val;
+            var returnUrlPaypal = $("#returnUrl").val;
+            var cancelReturnPaypal = $("#cancelReturn").val;
+            var notifyUrlPaypal = $("#notifyUrl").val;
+            var currencyCodePaypal = $("#currencyCode").val;
+            var itemNamePaypal = $("#itemName").val;
+            var amountPaypal = $("#amount").val;
+            paypal.Button.render({
+                env: 'sandbox', // sandbox | production
+                client: {
+                    sandbox: 'https://www.sandbox.paypal.com/cgi-bin/webscr'
+                },
+
+                style: {
+                    size: 'small',
+                    color: 'gold',
+                    shape: 'pill',
+                    label: 'checkout',
+                    tagline: 'true'
+                },
+
+                // Show the buyer a 'Pay Now' button in the checkout flow
+                commit: true,
+
+                // payment() is called when the button is clicked
+                payment: function (data, actions) {
+                    // Make a call to the REST API to set up the payment
+                    return actions.payment.create({
+                        payment: {
+                            transactions: [
+                                {
+                                    amount: { total: amountPaypal, currency: 'USD' },
+                                    cmd: cmdPaypal,
+                                    business: businessPaypal,
+                                    no_shipping: noShippingPaypal,
+                                    item_name: itemNamePaypal
+                                }
+                            ],
+                            redirect_urls: {
+                                return_url: returnUrlPaypal,
+                                cancel_url: cancelReturnPaypal,
+                                notify_url: notifyUrlPaypal
+                            },
+                        },
+                    });
+                },
+
+                // onAuthorize() is called when the buyer approves the payment
+                onAuthorize: function (data, actions) {
+
+                    // Make a call to the REST API to execute the payment
+                    return actions.payment.execute().then(function () {
+                        actions.redirect();
+                    }
+                    );
+                },
+
+                onCancel: function (data, actions) {
+                    actions.redirect();
+                },
+
+                onerror: function (err) {
+                    $.alert(err);
+                }
+
+            }, '#paypal-button-container');
+        </script>*@
+}

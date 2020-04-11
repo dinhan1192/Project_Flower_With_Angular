@@ -1,0 +1,113 @@
+﻿@model IEnumerable<Project_MVC.Models.Category>
+@using Project_MVC.Models
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var thisPage = ViewBag.Page as ThisPage;
+    var url = "/Categories/Delete/";
+
+    string ids = "";
+    var thisType = "AtView";
+}
+
+
+<h1>Index</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-3 firstbox">
+                <div class="form-group">
+                    @*<button class="btn btn-primary">@Html.ActionLink("Create New", "Create")</button>*@
+                    <a href="@Url.Action("Create", "Categories")" class="btn btn-primary">Create New</a>
+                </div>
+            </div>
+            <div class="col-md-9 secondbox secondbox2">
+                @using (Html.BeginForm("Index", "Categories", FormMethod.Get))
+                {
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <p>Find by Flower Category Name - Category Code:</p>
+                        </div>
+                        <div class="col-md-4">
+                            @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = "form-control col-md-4" })
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-success" type="submit">Search</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div><br />
+    <div class="col-md-11 tablebox">
+        <table class="table table-bordered" style="text-align:center">
+            <tr>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.Code)
+                </th>
+                <th class="text-center">
+                    @Html.ActionLink("Flower Category Name", "Index", new { sortOrder = ViewBag.NameSortParm })
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.ParentCode)
+                </th>
+                <th class="text-center">
+                    Category Image
+                </th>
+                <th class="text-center">
+                    @Html.ActionLink("Updated At", "Index", new { sortOrder = ViewBag.DateSortParm })
+                </th>
+                <th></th>
+            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Code)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.Raw(item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ParentCode)
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" width="80" height="80" />
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedAt)
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Edit", new { id = item.Code })">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                        <a href="@Url.Action("Details", new { id = item.Code })">
+                            <span class="glyphicon glyphicon-th-list"></span>
+                        </a>
+                        @*@Html.ActionLink(" ", "Delete", new { id = item.Code },
+                            new { @class = "glyphicon glyphicon-remove btn-delete-notify", @id = "delete-" + item.Code, data_request_url = @url })*@
+                        <a href="javascript:void(0)" class="glyphicon glyphicon-remove btn-delete-notify" id="@item.Code" data-request-url="@url"></a>
+                    </td>
+                </tr>
+            }
+        </table>
+        @Html.Partial("_Paginate", thisPage)
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+@section scripts{
+    @Scripts.Render("~/bundles/custom");
+}
+
+

@@ -1,0 +1,57 @@
+﻿@model Project_MVC.Models.AddPhoneNumberViewModel
+@using Project_MVC.Models
+@using Project_MVC.Utils
+@{
+    ViewBag.Title = "Phone Number";
+
+    if (RolesUtil.IsInAnyRole(User, new string[] { Constant.Admin, Constant.Employee }))
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutCustomerPage.cshtml";
+    }
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4 col-sm-push-5">
+            <div class="create_account">
+                <h2>@ViewBag.Title</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginForm("AddPhoneNumber", "Manages", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-sm-4 col-sm-push-4">
+            <div class="new_customer">
+                <h3>Add a phone number</h3>
+                <hr />
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Number, new { @class = "col-md-4 control-label" })
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.Number, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-8">
+                            <input type="submit" class="btn btn-success" value="Submit" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

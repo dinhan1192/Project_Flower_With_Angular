@@ -1,0 +1,327 @@
+﻿@using Project_MVC.Models
+@using Project_MVC.Utils
+@using Project_MVC.Services
+
+@{
+    Layout = "~/Views/Shared/_LayoutCustomerPage.cshtml";
+    ViewBag.Title = "GetParameter";
+    var cart = ViewBag.shoppingCart as ShoppingCart;
+    var flowerService = new MySQLFlowerService();
+    var categoryCode = ViewBag.CategoryCode;
+    var returnUrl = ViewBag.ReturnUrl;
+}
+
+@Html.Hidden("hidQuantity")
+<!--Start Shopping Cart top area -->
+@using (Html.BeginForm("UpdateCart", "ShoppingCart", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @*<input type="hidden" name="hidCategoryCode" id="hidCategoryCode" value="@categoryCode" />*@
+    @Html.Hidden("hidCategoryCode", (object)categoryCode)
+    <div class="shopping_cart_area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="cart_title">
+                        <h2>Shopping Cart</h2>
+                    </div>
+                    <div class="shopping-cart-table">
+                        <table class="cart_items">
+                            <tr>
+                                <th>Code</th>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total Price</th>
+                                <th>Cart Function</th>
+                            </tr>
+                            @*<tr>*@
+
+                            @foreach (var item in cart.GetCartItems())
+                            {
+                                <tr class="updateQuantity">
+                                    <td>@item.Value.FlowerCode</td>
+                                    @{
+                                        var flower = flowerService.Detail(item.Value.FlowerCode);
+                                        var flowerImages = new List<FlowerImage>();
+                                        var firstFlowerImage = new FlowerImage();
+                                        if (flower != null)
+                                        {
+                                            flowerImages = flower.FlowerImages.ToList();
+                                            if (flowerImages.Count > 0)
+                                            {
+                                                firstFlowerImage = flowerImages.OrderBy(s => s.CreatedAt).FirstOrDefault();
+                                            }
+                                        }
+                                    }
+                                    <td>
+                                        <img src="@firstFlowerImage.ImageUrl" alt="Smiley face" height="200" width="200">
+                                    </td>
+                                    <td>@item.Value.FlowerName</td>
+                                    <td>
+                                        <input type="number" name="quantity" id="quantity"
+                                               value="@item.Value.Quantity" data-code="@item.Value.FlowerCode"
+                                               data-quantity="@item.Value.Quantity" data-unitprice="@item.Value.Price" />
+                                    </td>
+                                    <td>@item.Value.Price.ToString("C", FlowerUtility.UnitedStates)</td>
+                                    @{
+                                        var TotalPricePerFlower = item.Value.Quantity * item.Value.Price;
+                                    }
+                                    <td>
+                                        @*<span class="totalPricePerFlower">@TotalPricePerFlower.ToString("C", FlowerUtility.UnitedStates)</span>*@
+                                        <input type="text" class="totalPricePerFlower" id="totalPricePerFlow" name="totalPricePerFlow"
+                                               readonly style="width:100px;"
+                                               value="@TotalPricePerFlower.ToString("C", FlowerUtility.UnitedStates)" />
+                                    </td>
+                                    <td>
+                                        @*<a class="btn btn-info btn-sm" href="javascript:void(0);" id="updatePerFlower" name="updatePerFlower" data-name="@item.Value.FlowerName" data-returnCategoryCode="@categoryCode" data-code="@item.Value.FlowerCode" data-quantity="@item.Value.Quantity">
+                                                <svg class="bi bi-brush" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M15.213 1.018a.572.572 0 01.756.05.57.57 0 01.057.746C15.085 3.082 12.044 7.107 9.6 9.55c-.71.71-1.42 1.243-1.952 1.596-.508.339-1.167.234-1.599-.197-.416-.416-.53-1.047-.212-1.543.346-.542.887-1.273 1.642-1.977 2.521-2.35 6.476-5.44 7.734-6.411z" />
+                                                    <path d="M7 12a2 2 0 01-2 2c-1 0-2 0-3.5-.5s.5-1 1-1.5 1.395-2 2.5-2a2 2 0 012 2z" />
+                                                </svg>
+                                            </a>*@
+                                        <a class="btn btn-info btn-sm" href="javascript:void(0);" id="removeFromCart" data-name="@item.Value.FlowerName" data-returnCategoryCode="@categoryCode" data-code="@item.Value.FlowerCode">
+                                            <svg class="bi bi-trash" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z" />
+                                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" clip-rule="evenodd" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="shopping_cart_main">
+                        <div class="shopping_button">
+                            @if (string.IsNullOrEmpty(returnUrl))
+                            {
+                                <button type="button" onclick="location.href='@Url.Action("IndexCustomer", "Flowers", new { categoryCode = categoryCode })'" ; title="shop" class="continue_shopping">Continue picking Flowers</button>
+                            }
+                            else if (returnUrl.Contains("LoadShoppingCartPartialView"))
+                            {
+                                <button type="button" onclick="location.href='@Request.UrlReferrer.ToString()'" ; title="shop" class="continue_shopping">Continue picking Flowers</button>
+                            }
+                            else
+                            {
+                                <button type="button" onclick="location.href='@returnUrl'" ; title="shop" class="continue_shopping">Continue picking Flowers</button>
+                            }
+                        </div>
+                        @if (cart.GetCartItems() != null && cart.GetCartItems().Count != 0)
+                        {
+                            <div class="shopping_button">
+                                @if (string.IsNullOrEmpty(returnUrl))
+                                {
+                                    <button type="button" onclick="location.href='@Url.Action("ClearShoppingCart", "ShoppingCart", new { categoryCode = categoryCode })'" return false;" title="shop" class="continue_shopping">Remove cart</button>
+                                }
+                                else if (returnUrl.Contains("LoadShoppingCartPartialView"))
+                                {
+                                    <button type="button" onclick="location.href='@Url.Action("ClearShoppingCart", "ShoppingCart", new { categoryCode = categoryCode, returnUrl = @Request.UrlReferrer.ToString() })'" return false;" title="shop" class="continue_shopping">Remove cart</button>
+                                }
+                                else
+                                {
+                                    <button type="button" onclick="location.href='@Url.Action("ClearShoppingCart", "ShoppingCart", new { categoryCode = categoryCode, returnUrl = returnUrl })'" return false;" title="shop" class="continue_shopping">Remove cart</button>
+                                }
+                            </div>
+                            <div class="shopping_button">
+                                @*<button type="submit" class="continue_shopping" value="">Update Cart</button>
+                                    <span id="errmsg"></span>*@
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!--End Shopping Cart top area -->
+<!--Start Estimate Shipping,Discount,Total checkout area -->
+<div class="cart-collaterals-item">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="total_price">
+                    <table class="total_rate">
+                        <tr>
+                            <th>Grand Total</th>
+                            <th><span id="totalPriceCart">@cart.GetTotalPrice().ToString("C", FlowerUtility.UnitedStates)</span></th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="check_out_simble review_button">
+                    <button id="createOrder" data-info="@cart.GetCartItems().Count" data-categoryCode="@categoryCode" class="button">Create Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var lstQuantities = document.querySelectorAll('[name="quantity"]');
+            var lstUpdate = document.querySelectorAll('[name="updatePerFlower"]');
+            var lstTotalPricePerFlower = document.querySelectorAll('[name="totalPricePerFlow"]');
+            $.each(lstQuantities, function () {
+                $(this).keypress(function (e) {
+                    if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                        $("#errmsg").html("Enter digits only").show().fadeOut("slow");
+                        return false;
+                    }
+                })
+
+                $(this).bind('keyup mouseup', function () {
+                    var quantity = $(this).val();
+                    var unitPrice = $(this).attr("data-unitprice");
+                    var oldQuantity = $(this).attr("data-quantity");
+                    if (quantity == 0) {
+                        $.alert({
+                            title: 'Quantity!',
+                            content: 'Quantity must be more than 0',
+                        });
+                        $(this).val(oldQuantity);
+                        return false;
+                    } else if(quantity > 2147483647) {
+                        $.alert("Too much quantity!");
+                        $(this).val(oldQuantity);
+                        return false;
+                    }
+
+                    var code = $(this).attr("data-code");
+                      $.ajax({
+            async: false,
+                          type: "POST",
+                          url: "/ShoppingCart/UpdatePerFlower",
+            data: '{code: "' + code + '", quantity: "'+ quantity +'" }',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                //var message = $("#message");
+                oldQuantity = response;
+            }
+                      });
+                    $(this).attr("data-quantity", oldQuantity);
+                    var newTotalPricePerFlower = quantity * unitPrice;
+                    $(this).closest('tr').find('.totalPricePerFlower').val(newTotalPricePerFlower
+                        .toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+                    //$(this).parent().next().find('.totalPricePerFlower').innerHTML = newTotalPricePerFlower
+                    //    .toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                    //$(this).closest('.updateQuantity').find('#updatePerFlower').attr('data-quantity', $(this).val());
+                    //var quantity = $(this).closest('tr').find('#updatePerFlower').attr('data-quantity');
+
+                    GetLatestTotalPrice();
+            });
+
+//            $('#quantity').each(function () {
+//                $(this).bind('keyup mouseup', function () {
+//                    debugger;
+//                    $(this).closest('tr').find('#updateCart').attr('data-quantity', $(this).val());
+//});
+                //$(this).bind('change', function () {
+                //    debugger;
+                //    $(this).closest('#updateCart').attr('data-quantity', $(this).val());
+                //})
+            })
+
+            function GetLatestTotalPrice() {
+                var grandTotalPrice = 0;
+                $.each(lstTotalPricePerFlower, function () {
+                    var totalPricePerFlow = $(this).val().substring(1).replace(new RegExp(",", "g"), '');
+                    grandTotalPrice = grandTotalPrice + parseFloat(totalPricePerFlow);
+                });
+
+                document.getElementById('totalPriceCart').innerHTML = grandTotalPrice
+                    .toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            }
+
+            $.each(lstUpdate, function () {
+                 $(this).click(function () {
+                debugger;
+                var quantity = $(this).attr('data-quantity');
+                var code = $(this).attr("data-code");
+                var returnCategoryCode = $(this).attr("data-returnCategoryCode")
+                var updateUrl = "/ShoppingCart/UpdatePerFlower?code=" + code + "&quantity=" + quantity + "&returnCategoryCode=" + returnCategoryCode;
+                var name = $(this).attr("data-name")
+                $.confirm({
+                    async: false,
+                    title: 'Update Quantity!',
+                    content: 'Do you want to update quantity for this "' + name,
+                    buttons: {
+                        confirm: function () {
+                            window.location.href = updateUrl;
+                            //$.ajax({
+                            //    type: "POST",
+                            //    url: "/ShoppingCart/AddCart",
+                            //    data: '{code: "' + code + '", quantity: "'+ quantity +'" }',
+                            //    contentType: "application/json; charset=utf-8",
+                            //    dataType: "json",
+                            //    success: function (response) {
+                            //        validation = response;
+                            //    }
+                            //});
+                        },
+                        cancel: function () {
+                            $.alert('Canceled!');
+                        },
+                    }
+                });
+            });
+            })
+
+            $("#removeFromCart").click(function () {
+                var code = $(this).attr("data-code");
+                var returnCategoryCode = $(this).attr("data-returnCategoryCode")
+                var removeUrl = "/ShoppingCart/RemoveCart?code=" + code + "&returnCategoryCode=" + returnCategoryCode;
+                var name = $(this).attr("data-name")
+                $.confirm({
+                    async: false,
+                    title: 'Xóa khỏi giỏ hàng!',
+                    content: 'Bạn có muốn xóa sản phẩm "' + name + '" rất tuyệt vời ra khỏi giỏ hàng không ?',
+                    buttons: {
+                        confirm: function () {
+                            window.location.href = removeUrl;
+                            //$.ajax({
+                            //    type: "POST",
+                            //    url: "/ShoppingCart/AddCart",
+                            //    data: '{code: "' + code + '", quantity: "'+ quantity +'" }',
+                            //    contentType: "application/json; charset=utf-8",
+                            //    dataType: "json",
+                            //    success: function (response) {
+                            //        validation = response;
+                            //    }
+                            //});
+                        },
+                        cancel: function () {
+                            $.alert('Canceled!');
+                        },
+                    }
+                });
+            });
+
+            $("#createOrder").click(function () {
+                var cartCount = $(this).attr("data-info");
+                var categoryCode = $(this).attr("data-categoryCode");
+                if (cartCount === null || cartCount === "0") {
+                    $.confirm({
+                        async: false,
+                        title: 'Giỏ hàng rỗng!',
+                        content: 'Bạn cần chọn hoa!',
+                        buttons: {
+                            okay: function () {
+                                window.location.href = "@Url.Action("IndexCustomer", "Flowers")" + "?categoryCode=" + categoryCode;
+                            },
+                        }
+                    });
+                } else {
+                                window.location.href = "@Url.Action("CreateOrder", "ShoppingCart")";
+                }
+            });
+        });
+    </script>
+    @*onclick="return confirm('Ban co chac muon xoa san pham tuyet voi cua chung toi ra khoi gio hang khong.')"*@
+}

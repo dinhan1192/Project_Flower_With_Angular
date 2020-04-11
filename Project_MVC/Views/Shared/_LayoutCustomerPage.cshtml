@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Colorlib Listed Directory Template</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    @Styles.Render("~/Css-frontend")
+    @*@Scripts.Render("~/bundles/modernizr")*@
+    @Styles.Render("~/box")
+    @Scripts.Render("~/Modernizr")
+    @RenderSection("CustomStyles", required: false)
+</head>
+<body>
+    @Html.Partial("_HeaderBar")
+    <!-- END section -->
+    @RenderBody()
+    @Html.Partial("_FooterBar")
+    <!-- END footer -->
+    <!-- loader -->
+    @Scripts.Render("~/Js-frontend")
+    @*@Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")*@
+    @RenderSection("scripts", required: false)
+</body>
+</html>

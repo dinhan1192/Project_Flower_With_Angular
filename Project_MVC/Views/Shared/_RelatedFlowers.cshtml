@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Project_MVC.Models.Flower>
+@using Project_MVC.Models
+@using Project_MVC.Utils
+
+<div class="related_products_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="feature_text feature_upsell">
+                    <h4>Related Flowers</h4>
+                </div>
+                <div class="row">
+                    <div class="upsell_product_list">
+                        @{
+                            var lstFlowers = new List<Flower>();
+                            if (Model.ToList().Count >= 5)
+                            {
+                                lstFlowers = Model.Take(5).ToList();
+                            }
+                            else
+                            {
+                                lstFlowers = Model.ToList();
+                            }
+                        }
+                        @foreach (var item in lstFlowers)
+                        {
+                            <div class="col-lg-3">
+                                <div class="single_upsell">
+                                    <a href="@Url.Action("DetailCustomers", "Flowers", new { id = item.Code })"><img src="@item.FlowerImages.OrderByDescending(s => s.CreatedAt).FirstOrDefault().ImageUrl" alt="" /></a>
+                                    <div class="upsell_details">
+                                        <h2><a href="@Url.Action("DetailCustomers", "Flowers", new { id = item.Code })">@item.Name</a></h2>
+                                        <div class="product_rating">
+                                            <div class="stars-outer" data-rating="@item.Rating" data-type="AtPartialView">
+                                                <div class="stars-innerDisplay">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="product_rating">
+                                            <a href="#">@FlowerUtility.GetReviews(item.Code) Review(s) <span>I</span></a>
+                                            <a href="#"> Add Your Review</a>
+                                        </div>
+                                        <p style="color: red;">@Utility.NewPrice(item.Price, item.Discount).ToString("C", FlowerUtility.UnitedStates)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/Customs/displayMultipleRatingFlowers.js"></script>
+
